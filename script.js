@@ -82,7 +82,6 @@ function prevSong(){
     loadSong(songs[songIndex]);
     playSong();
 }
-console.log(songIndex);
 // Update Progress Bar & Time
 function updateProgressBar(e){
     if(isPlaying){
@@ -90,12 +89,18 @@ function updateProgressBar(e){
         // Upadate Progress bar width
         const progressPercent = (currentTime / duration) * 100;
         progress.style.width=`${progressPercent}%`;
-        currentTimeEl.textContent= +currentTime;
-         // Delay switching current Element to avoid NaN
-         if(currentSeconds){
-         currentEl.textContent= `${currentMinutes}:${currentSeconds}`;
-     }
         // Calculate display for duration
+        const durationMinutes = Math.floor(duration / 60);
+        let durationSeconds = Math.floor(duration % 60);
+        if(durationSeconds < 10){
+            durationSeconds = `0${durationSeconds}`
+        }
+         // Delay switching current Element to avoid NaN
+         if(durationSeconds){
+            durationEl.textContent= `${durationMinutes}:${durationSeconds}`;
+     }
+
+        // Calculate display for current Time
         const currentMinutes = Math.floor(currentTime / 60);
         let currentSeconds = Math.floor(currentTime % 60);
         if(currentSeconds < 10){
@@ -106,7 +111,17 @@ function updateProgressBar(e){
         
     } 
 }
+
+// Set Progress Bar
+function setProgressBar(e){
+    const width=this.clientWidth;
+    const clickX=e.offsetX;
+    const {duration} = music;
+    music.currentTime=(clickX / width) * duration;
+}
 // Event Listeners
 prevBtn.addEventListener('click', prevSong);
 nextBtn.addEventListener('click', nextSong);
+music.addEventListener('ended', nextSong);
 music.addEventListener('timeupdate', updateProgressBar);
+progressContainer.addEventListener('click', setProgressBar);
